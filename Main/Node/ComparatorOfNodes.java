@@ -1,4 +1,6 @@
-package Main;
+package Main.Node;
+
+import Main.Node.Node;
 
 import java.util.*;
 
