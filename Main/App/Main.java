@@ -53,6 +53,6 @@ public class Main {
 		
 		 hf.enCode ( root , "" );
 		System.out.println ( hf.str );
-		hf.decode ( hf.str , root );
+		hf.decode (  hf.str , root );
 	}
 }

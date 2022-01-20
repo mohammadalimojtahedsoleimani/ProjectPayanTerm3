@@ -2,8 +2,11 @@ package Main.Huffman;
 
 import Main.Node.Node;
 
+import java.lang.reflect.Type;
+
 public class Huffman {
 	public String str = "";
+	public String decode_str = "";
 	
 	public void enCode ( Node root , String s ) {
 		
@@ -20,29 +23,22 @@ public class Huffman {
 	}
 	
 	public void decode ( String s , Node root ) {
-		if ( root == null ) {
-			return;
-		}
-		char[] arr = s.toCharArray ( );
-		int index = 0;
-		StringBuilder rst = new StringBuilder ( );
-		while ( index < arr.length ) {
-			Node node = root;
-			while ( node != null ) {
-				if ( node.left == null && node.right == null ) {
-					rst.append ( node.data );
-					break;
-				} else {
-					char c = arr[ index ];
-					if ( c == '0' ) {
-						node = node.left;
-					} else {
-						node = node.right;
-					}
-					index++;
-				}
+		StringBuffer sb = new StringBuffer ( );
+		Node focus = root;
+		for ( int i = 0 ; i < s.length ( ) ; i++ ) {
+			assert focus != null;
+			if ( s.charAt ( i ) == '1' ) {
+				focus = focus.right;
+			} else {
+				focus = focus.left;
+			}
+			
+			if ( focus != null && focus.left == null && focus.right == null ) {
+				sb.append ( focus.data );
+				focus = root;
 			}
 		}
-		System.out.println ( rst );
+		System.out.println (sb.toString () );
+		
 	}
 }
