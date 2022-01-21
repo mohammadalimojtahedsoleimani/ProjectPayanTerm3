@@ -1,44 +1,83 @@
 package Main.Huffman;
 
+
 import Main.Node.Node;
 
-import java.lang.reflect.Type;
+import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 public class Huffman {
-	public String str = "";
-	public String decode_str = "";
 	
-	public void enCode ( Node root , String s ) {
-		
-		boolean isLetter = Character.isLetter ( root.c );
-		if ( root.left == null && root.right == null && isLetter ) {
-			System.out.println ( root.c + ":" + s );
-			str += s;
+	public Node root;
+	public final String text;
+	public Map < Character, Integer > charFrequencies;
+	public final Map < Character, String > huffmanCodes;
+	
+	
+	public Huffman ( String text ) {
+		this.text = text;
+		fillCharFrequenciesMap ( );
+		huffmanCodes = new HashMap <> ( );
+	}
+	
+	private void fillCharFrequenciesMap ( ) {
+		charFrequencies = new HashMap <> ( );
+		for ( char character : text.toCharArray ( ) ) {
+			Integer integer = charFrequencies.get ( character );
+			charFrequencies.put ( character , integer != null ? integer + 1 : 1 );
+		}
+	}
+	
+	
+	public String encode ( ) {
+		Queue < Node > queue = new PriorityQueue <> ( );
+		charFrequencies.forEach ( ( character , frequency ) ->
+				queue.add ( new Leaf ( character , frequency ) )
+		);
+		while ( queue.size ( ) > 1 ) {
+			queue.add ( new Node ( queue.poll ( ) , requireNonNull ( queue.poll ( ) ) ) );
+		}
+		generateHuffmanCodes ( root = queue.poll ( ) , "" );
+		return getEncodedText ( );
+	}
+	
+	private void generateHuffmanCodes ( Node node , String code ) {
+		if ( node instanceof Leaf ) {
+			huffmanCodes.put ( ( ( Leaf ) node ).getCharacter ( ) , code );
 			return;
 		}
-		assert root.left != null;
-		assert root.right != null;
-		enCode ( root.left , s + "0" );
-		enCode ( root.right , s + "1" );
+		generateHuffmanCodes ( node.getLeftNode ( ) , code.concat ( "0" ) );
+		generateHuffmanCodes ( node.getRightNode ( ) , code.concat ( "1" ) );
 	}
 	
-	public void decode ( String s , Node root ) {
-		StringBuffer sb = new StringBuffer ( );
-		Node focus = root;
-		for ( int i = 0 ; i < s.length ( ) ; i++ ) {
-			assert focus != null;
-			if ( s.charAt ( i ) == '1' ) {
-				focus = focus.right;
-			} else {
-				focus = focus.left;
-			}
-			
-			if ( focus != null && focus.left == null && focus.right == null ) {
-				sb.append ( focus.data );
-				focus = root;
+	private String getEncodedText ( ) {
+		StringBuilder sb = new StringBuilder ( );
+		for ( char character : text.toCharArray ( ) ) {
+			sb.append ( huffmanCodes.get ( character ) );
+		}
+		return sb.toString ( );
+	}
+	
+	
+	public String decode ( String encodedText ) {
+		StringBuilder sb = new StringBuilder ( );
+		Node current = root;
+		for ( char character : encodedText.toCharArray ( ) ) {
+			current = character == '0' ? current.getLeftNode ( ) : current.getRightNode ( );
+			if ( current instanceof Leaf ) {
+				sb.append ( ( ( Leaf ) current ).getCharacter ( ) );
+				current = root;
 			}
 		}
-		System.out.println (sb.toString () );
-		
+		return sb.toString ( );
 	}
+	
+	
+	public void printCodes ( ) {
+		huffmanCodes.forEach ( ( character , code ) ->
+				System.out.println ( character + ": " + code )
+		);
+	}
+	
 }
