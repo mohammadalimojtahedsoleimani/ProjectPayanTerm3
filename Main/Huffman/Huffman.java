@@ -1,6 +1,7 @@
 package Main.Huffman;
 
 
+import Main.Node.Leaf;
 import Main.Node.Node;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class Huffman {
 		huffmanCodes = new HashMap <> ( );
 	}
 	
-	private void fillCharFrequenciesMap ( ) {
+	public void fillCharFrequenciesMap ( ) {
 		charFrequencies = new HashMap <> ( );
 		for ( char character : text.toCharArray ( ) ) {
 			Integer integer = charFrequencies.get ( character );
@@ -42,7 +43,7 @@ public class Huffman {
 		return getEncodedText ( );
 	}
 	
-	private void generateHuffmanCodes ( Node node , String code ) {
+	public void generateHuffmanCodes ( Node node , String code ) {
 		if ( node instanceof Leaf ) {
 			huffmanCodes.put ( ( ( Leaf ) node ).getCharacter ( ) , code );
 			return;
@@ -51,7 +52,7 @@ public class Huffman {
 		generateHuffmanCodes ( node.getRightNode ( ) , code.concat ( "1" ) );
 	}
 	
-	private String getEncodedText ( ) {
+	public String getEncodedText ( ) {
 		StringBuilder sb = new StringBuilder ( );
 		for ( char character : text.toCharArray ( ) ) {
 			sb.append ( huffmanCodes.get ( character ) );
