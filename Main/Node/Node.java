@@ -8,13 +8,13 @@ import lombok.RequiredArgsConstructor;
 public class Node implements Comparable<Node> {
 	
 	public final int frequency;
-	public Node leftNode;
-	public Node rightNode;
+	public Node left;
+	public Node right;
 	
-	public Node(Node leftNode, Node rightNode) {
-		this.leftNode = leftNode;
-		this.rightNode = rightNode;
-		this.frequency = leftNode.getFrequency() + rightNode.getFrequency();
+	public Node( Node left , Node right) {
+		this.left = left;
+		this.right = right;
+		this.frequency = left.getFrequency() + right.getFrequency();
 	}
 	
 	@Override

@@ -1,7 +1,7 @@
 package Main.Huffman;
 
 
-import Main.Node.Leaf;
+import Main.Node.Leaves;
 import Main.Node.Node;
 
 import java.util.*;
@@ -12,51 +12,52 @@ public class Huffman {
 	
 	public Node root;
 	public final String text;
-	public Map < Character, Integer > charFrequencies;
-	public final Map < Character, String > huffmanCodes;
+	public Map < Character, Integer > charFreq;
+	public final Map < Character, String > huffman;
 	
 	
 	public Huffman ( String text ) {
 		this.text = text;
 		fillCharFrequenciesMap ( );
-		huffmanCodes = new HashMap <> ( );
+		huffman = new HashMap <> ( );
 	}
 	
 	public void fillCharFrequenciesMap ( ) {
-		charFrequencies = new HashMap <> ( );
-		for ( char character : text.toCharArray ( ) ) {
-			Integer integer = charFrequencies.get ( character );
-			charFrequencies.put ( character , integer != null ? integer + 1 : 1 );
+		charFreq = new HashMap <> ( );
+		char[] charArray;
+		charArray = text.toCharArray ( );
+		for ( char character : charArray ) {
+			Integer integer = charFreq.get ( character );
+			charFreq.put ( character , integer != null ? integer + 1 : 1 );
 		}
 	}
 	
 	
 	public String encode ( ) {
-		Queue < Node > queue = new PriorityQueue <> ( );
-		charFrequencies.forEach ( ( character , frequency ) ->
-				queue.add ( new Leaf ( character , frequency ) )
-		);
-		while ( queue.size ( ) > 1 ) {
-			queue.add ( new Node ( queue.poll ( ) , requireNonNull ( queue.poll ( ) ) ) );
+		PriorityQueue < Node > qu = new PriorityQueue <> ( );
+		for ( Map.Entry < Character, Integer > entry : charFreq.entrySet ( ) ) {
+			Character character = entry.getKey ( );
+			Integer frequency = entry.getValue ( );
+			qu.add ( new Leaves ( character , frequency ) );
 		}
-		generateHuffmanCodes ( root = queue.poll ( ) , "" );
-		return getEncodedText ( );
+		while ( qu.size ( ) > 1 ) qu.add ( new Node ( qu.poll ( ) , requireNonNull ( qu.poll ( ) ) ) );
+		huffmanCodeGenerator ( root = qu.poll ( ) , "" );
+		return getTextOfEncoded ( );
 	}
 	
-	public void generateHuffmanCodes ( Node node , String code ) {
-		if ( node instanceof Leaf ) {
-			huffmanCodes.put ( ( ( Leaf ) node ).getCharacter ( ) , code );
+	public void huffmanCodeGenerator ( Node node , String code ) {
+		if ( node instanceof Leaves ) {
+			huffman.put ( ( ( Leaves ) node ).getCharacter ( ) , code );
 			return;
 		}
-		generateHuffmanCodes ( node.getLeftNode ( ) , code.concat ( "0" ) );
-		generateHuffmanCodes ( node.getRightNode ( ) , code.concat ( "1" ) );
+		huffmanCodeGenerator ( node.getLeft ( ) , code.concat ( "0" ) );
+		huffmanCodeGenerator ( node.getRight ( )
+				, code.concat ( "1" ) );
 	}
 	
-	public String getEncodedText ( ) {
-		StringBuilder sb = new StringBuilder ( );
-		for ( char character : text.toCharArray ( ) ) {
-			sb.append ( huffmanCodes.get ( character ) );
-		}
+	public String getTextOfEncoded ( ) {
+		var sb = new StringBuilder ( );
+		for ( char character : text.toCharArray ( ) ) sb.append ( huffman.get ( character ) );
 		return sb.toString ( );
 	}
 	
@@ -64,10 +65,12 @@ public class Huffman {
 	public String decode ( String encodedText ) {
 		StringBuilder sb = new StringBuilder ( );
 		Node current = root;
-		for ( char character : encodedText.toCharArray ( ) ) {
-			current = character == '0' ? current.getLeftNode ( ) : current.getRightNode ( );
-			if ( current instanceof Leaf ) {
-				sb.append ( ( ( Leaf ) current ).getCharacter ( ) );
+		char[] charArray = encodedText.toCharArray ( );
+		for ( int i = 0, arrayLength = charArray.length ; i < arrayLength ; i++ ) {
+			char character = charArray[ i ];
+			current = character == '0' ? current.getLeft ( ) : current.getRight ( );
+			if ( current instanceof Leaves ) {
+				sb.append ( ( ( Leaves ) current ).getCharacter ( ) );
 				current = root;
 			}
 		}
@@ -75,8 +78,8 @@ public class Huffman {
 	}
 	
 	
-	public void printCodes ( ) {
-		huffmanCodes.forEach ( ( character , code ) ->
+	public void print ( ) {
+		huffman.forEach ( ( character , code ) ->
 				System.out.println ( character + ": " + code )
 		);
 	}

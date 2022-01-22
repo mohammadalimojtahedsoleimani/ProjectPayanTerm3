@@ -9,15 +9,15 @@ public class Main {
 		Scanner input = new Scanner ( System.in );
 		String inp = input.next ( );
 		
-		Huffman huffman = new Huffman ( inp );
+		Huffman hf = new Huffman ( inp );
 		
-		String encodedText = huffman.encode ( );
-		System.out.println ( encodedText );
+		String text = hf.encode ( );
+		System.out.println ( text );
 		
-		huffman.printCodes ( );
+		hf.print ( );
 		
-		String originalText = huffman.decode ( encodedText );
-		System.out.println ( originalText );
+		String hfText = hf.decode ( text );
+		System.out.println ( hfText );
 		
 	}
 	
